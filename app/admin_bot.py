@@ -344,6 +344,12 @@ PayGate orqali siz HUMO va UZCARD kartalaringizga tushgan pullarni avtomatik ani
 📲 <b>/login</b>
 • <i>Nega kerak:</i> Telefoningizdagi Telegram orqali QR-kodni skan qilib, karta xabarlarini avtomatik tutib oluvchi userbotni ishga tushirish.
 
+💾 <b>/backup</b>
+• <i>Nega kerak:</i> Barcha kartalar, loyihalar va to‘lovlar bazasini darhol Telegramga zaxira (backup) qilib yuborish va mahkamlash.
+
+🔄 <b>/restore</b>
+• <i>Nega kerak:</i> Mahkamlangan (pinned) zaxira xabaridan ma’lumotlar bazasini qayta tiklash.
+
 ❌ <b>/cancel</b>
 • <i>Nega kerak:</i> Boshlangan har qanday amalni darhol bekor qilish."""
 
@@ -813,6 +819,26 @@ async def handle(chat_id: str, text: str, message_id: int = 0) -> None:
             _login_task = asyncio.create_task(qr_login(chat_id))
         return
 
+    if command == "/backup":
+        from . import backup
+        await send(chat_id, "📦 <b>Zaxira olinmoqda va Telegramga yuklanmoqda...</b>")
+        ok = await backup.send_backup(chat_id=chat_id, pin=True)
+        if ok:
+            await send(chat_id, "✅ <b>Muvaffaqiyatli!</b> Baza to‘liq zaxiralanib, xabar mahkamlandi (pinned).")
+        else:
+            await send(chat_id, "❌ Zaxira olishda xatolik yuz berdi yoki baza bo‘sh.")
+        return
+
+    if command == "/restore":
+        from . import backup
+        await send(chat_id, "🔄 <b>Mahkamlangan (pinned) xabardan baza tiklanmoqda...</b>")
+        ok = await backup.restore_from_telegram(chat_id=chat_id)
+        if ok:
+            await send(chat_id, "✅ <b>Baza muvaffaqiyatli tiklandi!</b> Loyihalar ro‘yxatini ko‘rish uchun: 📂 Loyihalar")
+        else:
+            await send(chat_id, "❌ Mahkamlangan (pinned) zaxira xabari topilmadi yoki yuklab bo‘lmadi.")
+        return
+
     # Loyihani aniqlash (bitta loyiha bo'lsa yoki SHOP_ID berilgan bo'lsa)
     target_shop_id = parts[1] if len(parts) >= 2 else ""
     project, all_projects = await get_target_project(target_shop_id)
@@ -1242,10 +1268,33 @@ async def run() -> None:
                             log.exception("Callback query xatosi")
                     continue
 
-                # 2. Oddiy xabar kelganda (message)
+                # 2. Xabar kelganda (message)
                 message = update.get("message") or {}
-                text = (message.get("text") or "").strip()
                 chat_id = str((message.get("chat") or {}).get("id", ""))
+                doc = message.get("document")
+                if doc and chat_id:
+                    admin = await owner()
+                    if admin and chat_id == admin:
+                        fname = doc.get("file_name", "")
+                        if fname.endswith(".db"):
+                            file_id = doc.get("file_id")
+                            finfo = await api("getFile", file_id=file_id)
+                            if finfo and finfo.get("file_path"):
+                                from . import backup
+                                client = get_client()
+                                url = f"https://api.telegram.org/file/bot{config.BOT_TOKEN}/{finfo['file_path']}"
+                                r = await client.get(url)
+                                if backup.restore_from_bytes(r.content):
+                                    await send(
+                                        chat_id,
+                                        f"✅ <b>'{html.escape(fname)}' bazasi o‘rnatildi va tiklandi!</b>\n"
+                                        f"Loyihalarni ko‘rish uchun: 📂 Loyihalar",
+                                    )
+                                else:
+                                    await send(chat_id, "❌ Yuborilgan fayl SQLite formati emas yoki buzilgan.")
+                            continue
+
+                text = (message.get("text") or message.get("caption") or "").strip()
                 if text and chat_id:
                     try:
                         await handle(

@@ -81,6 +81,7 @@ BALANCE_KEYWORDS = _list(
 # --- Ixtiyoriy: egasiga Telegram bot orqali bildirishnoma ---
 NOTIFY_BOT_TOKEN = _str("NOTIFY_BOT_TOKEN")
 NOTIFY_CHAT_ID = _str("NOTIFY_CHAT_ID")
+ADMIN_CHAT_ID = _str("ADMIN_CHAT_ID") or NOTIFY_CHAT_ID
 BOT_TOKEN = _str("BOT_TOKEN") or NOTIFY_BOT_TOKEN
 # TG_SESSION bo'sh bo'lsa, egasining bot chatida bir martalik login boshlanadi
 BOT_LOGIN_ENABLED = _bool("BOT_LOGIN_ENABLED", True)

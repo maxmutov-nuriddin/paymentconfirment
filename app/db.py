@@ -72,7 +72,7 @@ async def init() -> None:
     await _db.execute("CREATE INDEX IF NOT EXISTS idx_pay_shop_status ON payments(shop_id,status)")
     # Eski .env sozlamalarini bir marta bazaga xavfsiz ko'chirish.
     seeds = {
-        "admin_chat_id": config.NOTIFY_CHAT_ID,
+        "admin_chat_id": str(config.ADMIN_CHAT_ID or config.NOTIFY_CHAT_ID or ""),
         "tg_api_id": str(config.TG_API_ID or ""),
         "tg_api_hash": config.TG_API_HASH,
         "tg_session": config.TG_SESSION,
@@ -95,6 +95,14 @@ def conn() -> aiosqlite.Connection:
 
 def now() -> int:
     return int(time.time())
+
+
+def notify_changed() -> None:
+    try:
+        from . import backup
+        backup.schedule_backup()
+    except Exception:
+        pass
 
 
 async def get_payment(payment_id: str) -> dict | None:
@@ -130,6 +138,8 @@ async def set_status(payment_id: str, status: str, source_msg: str | None = None
         (status, now() if status == "paid" else None, source_msg, payment_id),
     )
     await conn().commit()
+    if cur.rowcount > 0 and status == "paid":
+        notify_changed()
     return cur.rowcount > 0
 
 
@@ -226,6 +236,7 @@ async def set_setting(key: str, value: str) -> None:
         (key, value),
     )
     await conn().commit()
+    notify_changed()
 
 
 async def get_base_url() -> str:
@@ -245,6 +256,7 @@ async def create_project(project: dict) -> None:
          int(project.get("auto_unique", True)), now()),
     )
     await conn().commit()
+    notify_changed()
 
 
 async def get_project(shop_id: str) -> dict | None:
@@ -275,4 +287,6 @@ async def update_project(shop_id: str, field: str, value) -> bool:
         raise ValueError("unsupported project field")
     cur = await conn().execute(f"UPDATE projects SET {field}=? WHERE shop_id=?", (value, shop_id))
     await conn().commit()
+    if cur.rowcount > 0:
+        notify_changed()
     return cur.rowcount > 0

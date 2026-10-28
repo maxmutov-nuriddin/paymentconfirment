@@ -8,7 +8,7 @@ from pathlib import Path
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse, JSONResponse
 
-from . import admin_bot, callbacks, config, db, matcher, parser, watcher
+from . import admin_bot, backup, callbacks, config, db, matcher, parser, watcher
 
 logging.basicConfig(
     level=logging.DEBUG if config.DEBUG else logging.INFO,
@@ -30,14 +30,18 @@ async def lifespan(app: FastAPI):
         for e in errors:
             log.error("Sozlama xatosi: %s", e)
         sys.exit(1)
+    # Baza bo'sh yoki topilmasa, Telegram'dagi zaxiradan avtomatik tiklash
+    await backup.try_auto_restore()
     await db.init()
     await matcher.resend_undelivered()
     await watcher.start()
     admin_bot.start()
+    backup.start()
     expiry = asyncio.create_task(matcher.expiry_loop())
     log.info("%s ishga tushdi: %s", config.APP_NAME, config.BASE_URL)
     yield
     expiry.cancel()
+    await backup.stop()
     await admin_bot.stop()
     await watcher.stop()
     await db.close()
