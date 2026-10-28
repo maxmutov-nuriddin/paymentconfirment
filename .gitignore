@@ -1,0 +1,7 @@
+.env
+.env.pre-bot-management
+data/
+__pycache__/
+*.pyc
+*.session
+.venv/

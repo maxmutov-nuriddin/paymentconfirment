@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{APP_NAME}} — Telegram botlar uchun avtomatik to'lov</title>
+<style>
+  :root{--bg:#0b0f17;--card:#121826;--line:#1f2937;--txt:#e5e7eb;--mut:#9ca3af;--acc:#22c55e;--acc2:#3b82f6;--red:#ef4444;--yel:#f59e0b}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--txt);line-height:1.6}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 20px}
+  nav{position:sticky;top:0;background:rgba(11,15,23,.85);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);z-index:10}
+  nav .wrap{display:flex;align-items:center;justify-content:space-between;height:64px}
+  .logo{font-weight:800;font-size:20px}.logo span{color:var(--acc)}
+  nav .links a{margin-left:22px;color:var(--mut);font-size:15px}nav .links a:hover{color:var(--txt)}
+  .btn{display:inline-block;padding:12px 22px;border-radius:10px;font-weight:600;border:1px solid var(--line);cursor:pointer;font-size:15px;background:none;color:var(--txt)}
+  .btn.pri{background:var(--acc);color:#04130a;border-color:var(--acc)}
+  .btn:hover{opacity:.9}
+  section{padding:80px 0;border-bottom:1px solid var(--line)}
+  .hero{display:grid;grid-template-columns:1.1fr 1fr;gap:40px;align-items:center}
+  .badge{display:inline-block;padding:6px 12px;border-radius:99px;background:#16a34a22;color:var(--acc);font-size:13px;margin-bottom:18px}
+  h1{font-size:44px;line-height:1.15;margin-bottom:18px}
+  h2{font-size:34px;margin-bottom:10px;text-align:center}
+  .sub{color:var(--mut);text-align:center;margin-bottom:44px}
+  .lead{color:var(--mut);font-size:18px;margin-bottom:28px}
+  .stats{display:flex;gap:28px;margin-top:34px;flex-wrap:wrap}.stats b{display:block;font-size:24px}.stats small{color:var(--mut)}
+  .term{background:#05080e;border:1px solid var(--line);border-radius:14px;overflow:hidden;font-family:ui-monospace,Consolas,monospace;font-size:13.5px}
+  .term .bar{padding:10px 14px;border-bottom:1px solid var(--line);color:var(--mut);display:flex;gap:6px;align-items:center}
+  .dot{width:11px;height:11px;border-radius:50%;display:inline-block}
+  .term pre{padding:16px;white-space:pre-wrap;min-height:220px;max-height:340px;overflow:auto}
+  .g{color:var(--acc)}.b{color:#60a5fa}.y{color:var(--yel)}.r{color:var(--red)}.m{color:var(--mut)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:24px}
+  .card .n{color:var(--acc);font-weight:800;font-size:14px}
+  .card h3{margin:6px 0 8px;font-size:18px}.card p{color:var(--mut);font-size:15px}
+  .card ul{margin-top:10px;padding-left:18px;color:var(--mut);font-size:14px}
+  .demo{display:grid;grid-template-columns:1fr 1fr 1.3fr;gap:18px}
+  label{display:block;font-size:13px;color:var(--mut);margin:10px 0 4px}
+  input{width:100%;padding:10px 12px;border-radius:8px;border:1px solid var(--line);background:#0b111c;color:var(--txt);font-size:15px}
+  .status{font-size:46px;text-align:center;margin:20px 0 6px}.status+p{text-align:center;color:var(--mut)}
+  .docs{display:grid;grid-template-columns:340px 1fr;gap:18px}
+  .ep{display:flex;gap:10px;align-items:center;padding:9px 0;border-bottom:1px dashed var(--line);font-size:14px}
+  .ep code{font-size:13px}
+  .m-post,.m-get{font-size:11px;font-weight:800;padding:2px 7px;border-radius:5px}
+  .m-post{background:#3b82f622;color:#60a5fa}.m-get{background:#22c55e22;color:var(--acc)}
+  .kv{font-size:14px;margin-top:14px}.kv code{background:#0b111c;padding:2px 6px;border-radius:5px}
+  .tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+  .tab{padding:7px 12px;border-radius:8px;border:1px solid var(--line);background:none;color:var(--mut);cursor:pointer;font-size:13px}
+  .tab.on{background:var(--acc2);color:#fff;border-color:var(--acc2)}
+  .code{position:relative}
+  .code pre{background:#05080e;border:1px solid var(--line);border-radius:12px;padding:18px;overflow:auto;font-size:13px;font-family:ui-monospace,Consolas,monospace;max-height:520px}
+  .copy{position:absolute;top:10px;right:10px;padding:5px 10px;font-size:12px}
+  .flow{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:18px}
+  .flow div{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;text-align:center;font-size:14px}
+  details{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 20px;margin-bottom:10px}
+  summary{cursor:pointer;font-weight:600}details p{color:var(--mut);margin-top:10px}
+  footer{padding:40px 0;color:var(--mut);font-size:14px;text-align:center}
+  @media(max-width:900px){.hero,.demo,.docs{grid-template-columns:1fr}.flow{grid-template-columns:1fr 1fr}h1{font-size:32px}nav .links{display:none}}
+</style>
+</head>
+<body>
+
+<nav><div class="wrap">
+  <div class="logo">{{APP_NAME}}<span>.</span></div>
+  <div class="links"><a href="#how">Qanday ishlaydi</a><a href="#features">Xususiyatlar</a><a href="#demo">Demo</a><a href="#docs">API Docs</a><a href="#faq">FAQ</a></div>
+  <a class="btn pri" href="#docs">Boshlash</a>
+</div></nav>
+
+<section><div class="wrap hero">
+  <div>
+    <span class="badge">⚡ Self-hosted · Real-time to'lov kuzatish</span>
+    <h1>Telegram botingizga avtomatik to'lov tizimini ulang</h1>
+    <p class="lead">HUMO va UZCARD kartangizga tushgan pullar 5–30 soniyada aniqlanadi. To'liq o'z serveringizda ishlaydi, uchinchi tomonga hech narsa bermaysiz.</p>
+    <a class="btn pri" href="#docs">API hujjatlari</a> <a class="btn" href="#demo">Jonli demo</a>
+    <div class="stats"><div><b>5–30s</b><small>Aniqlash</small></div><div><b>2</b><small>Karta tizimi</small></div><div><b>100%</b><small>O'z serveringiz</small></div><div><b>24/7</b><small>Ishlash</small></div></div>
+  </div>
+  <div class="term">
+    <div class="bar"><span class="dot" style="background:#ef4444"></span><span class="dot" style="background:#f59e0b"></span><span class="dot" style="background:#22c55e"></span>&nbsp; {{BASE_URL}}</div>
+<pre><span class="b">POST</span> /payment/create
+<span class="m">shop_id:</span> "my_shop"   <span class="m">amount:</span> 50000
+
+<span class="g">✓ To'lov yaratildi</span>
+<span class="m">payment_id:</span> "a1b2c3d4e5f6"
+<span class="m">status:</span> <span class="y">"pending"</span>
+
+<span class="y">⏳ Karta kuzatilmoqda...</span>
+<span class="g">✅ To'lov tasdiqlandi (12s)</span>
+<span class="b">POST</span> complete_url  <span class="m">status=</span><span class="g">"paid"</span></pre>
+  </div>
+</div></section>
+
+<section id="how"><div class="wrap">
+  <h2>Qanday ishlaydi?</h2><p class="sub">4 qadamda to'liq avtomatlashtirilgan to'lov</p>
+  <div class="grid">
+    <div class="card"><div class="n">01</div><h3>Serverga o'rnating</h3><p>Kodni yuklab, <code>.env</code> faylini to'ldiring: SHOP_ID, SHOP_KEY, karta raqami, Telegram API kalitlari.</p></div>
+    <div class="card"><div class="n">02</div><h3>Karta botlarini ulang</h3><p>Telegram akkauntingizda @HumoCardBot (HUMO) yoki @CardXabarBot (UZCARD) ga kartangizni ulang.</p><ul><li>Bir nechta karta mumkin</li><li>Userbot xabarlarni o'qiydi</li></ul></div>
+    <div class="card"><div class="n">03</div><h3>To'lov yarating</h3><p><code>POST /payment/create</code> — javobda payment_id va karta raqami qaytadi, mijozga shuni ko'rsatasiz.</p></div>
+    <div class="card"><div class="n">04</div><h3>Natija o'zi keladi</h3><p>Pul tushishi bilan <code>complete_url</code> ga <b>paid</b>, {{PAYMENT_TTL_MIN}} daqiqada topilmasa <b>cancel</b> yuboriladi. Cron kerak emas.</p></div>
+  </div>
+</div></section>
+
+<section id="features"><div class="wrap">
+  <h2>Nima uchun {{APP_NAME}}?</h2><p class="sub">Bitta kod — har kim o'z serverida, faqat .env bilan boshqariladi</p>
+  <div class="grid">
+    <div class="card"><h3>⚡ Real-time</h3><p>Karta bot xabari kelishi bilan to'lov tasdiqlanadi.</p></div>
+    <div class="card"><h3>🔒 Xavfsiz</h3><p>Ma'lumotlar faqat sizning serveringizda. Callbacklar md5 imzo bilan.</p></div>
+    <div class="card"><h3>💳 HUMO + UZCARD</h3><p>Ikkala karta tizimi, bir nechta karta navbat bilan.</p></div>
+    <div class="card"><h3>🔔 Webhook</h3><p>prepare va complete callbacklar, avtomatik qayta urinish bilan.</p></div>
+    <div class="card"><h3>🧩 Oddiy REST</h3><p>JSON yoki form-data. Istalgan til: Python, PHP, Node.js...</p></div>
+    <div class="card"><h3>🐳 Docker</h3><p><code>docker compose up -d</code> — tayyor.</p></div>
+  </div>
+</div></section>
+
+<section id="demo"><div class="wrap">
+  <h2>Jonli demo</h2><p class="sub">Simulyator — haqiqiy so'rov yuborilmaydi</p>
+  <div class="demo">
+    <div class="card"><h3>🧪 Demo to'lov</h3>
+      <label>shop_id</label><input id="d_shop" value="shop_demo">
+      <label>shop_key</label><input id="d_key" value="sk_demo_****">
+      <label>amount (so'm)</label><input id="d_amount" type="number" value="50000">
+      <br><br><button class="btn pri" id="d_run" style="width:100%">Simulyatsiya boshlash</button>
+    </div>
+    <div class="card"><h3>📊 Holat</h3><div class="status" id="d_icon">⬜</div><p id="d_text">Simulyatsiyani boshlang</p></div>
+    <div class="term"><div class="bar">log monitor</div><pre id="d_log"><span class="m">Log shu yerda ko'rinadi...</span></pre></div>
+  </div>
+</div></section>
+
+<section id="docs"><div class="wrap">
+  <h2>API hujjatlari</h2><p class="sub">Base URL: <code>{{BASE_URL}}</code></p>
+  <div class="docs">
+    <div class="card">
+      <h3>📋 Endpointlar</h3>
+      <div class="ep"><span class="m-post">POST</span><code>/payment/create</code></div>
+      <div class="ep"><span class="m-post">POST</span><code>prepare_url</code><span class="m">← biz yuboramiz</span></div>
+      <div class="ep"><span class="m-post">POST</span><code>complete_url</code><span class="m">← biz yuboramiz</span></div>
+      <div class="ep"><span class="m-get">GET</span><code>/payment/status</code></div>
+      <div class="ep"><span class="m-post">POST</span><code>/payment/cancel</code></div>
+      <div class="ep"><span class="m-get">GET</span><code>/stats</code></div>
+      <div class="kv"><b>Parametrlar (create)</b><br>
+        <code>shop_id</code>* <code>shop_key</code>* <code>amount</code>*<br><code>order_id</code> <code>prepare_url</code> <code>complete_url</code></div>
+      <div class="kv"><b>Callback imzosi</b><br><code>md5(shop_id + payment_id + amount + shop_key)</code></div>
+      <div class="kv"><b>Muddat</b><br>{{PAYMENT_TTL_MIN}} daqiqa, keyin avtomatik cancel</div>
+      <div class="kv"><a class="btn" href="/swagger">Swagger UI →</a></div>
+    </div>
+    <div>
+      <div class="tabs" id="tabs"></div>
+      <div class="code"><button class="btn copy" id="copy">Nusxalash</button><pre id="code"></pre></div>
+      <div class="flow"><div>🔔<br><b>prepare</b><br><span class="m">boshlandi</span></div><div>⏳<br><b>pending</b><br><span class="m">kutilmoqda</span></div><div>✅<br><b>paid</b><br><span class="m">tasdiqlandi</span></div><div>❌<br><b>cancel</b><br><span class="m">topilmadi</span></div></div>
+    </div>
+  </div>
+</div></section>
+
+<section id="faq"><div class="wrap" style="max-width:820px">
+  <h2>Ko'p beriladigan savollar</h2><p class="sub">&nbsp;</p>
+  <details><summary>🤖 Bu nima?</summary><p>HUMO/UZCARD kartangizga tushgan to'lovlarni Telegram karta botlari xabarlari orqali avtomatik aniqlab, botingizga callback yuboradigan self-hosted API.</p></details>
+  <details><summary>⚙️ Qanday ishlaydi?</summary><p>Servis sizning Telegram akkauntingizga userbot sifatida ulanadi va @HumoCardBot / @CardXabarBot xabarlarini o'qiydi. Kirim summasi ochiq to'lov summasiga mos kelsa — to'lov paid bo'ladi.</p></details>
+  <details><summary>🔢 Ikki mijoz bir xil summa to'lasa-chi?</summary><p>Bir vaqtda bir xil summada ikkita ochiq to'lov bo'lolmaydi. Summani 1-2 so'mga o'zgartiring (50000 → 50001) yoki .env da <code>AUTO_UNIQUE_AMOUNT=true</code> qiling — tizim o'zi oshiradi.</p></details>
+  <details><summary>⏱️ Cron kerakmi?</summary><p>Yo'q. Har bir to'lov albatta bitta yakuniy callback bilan tugaydi: paid yoki cancel.</p></details>
+  <details><summary>🔒 Xavfsizmi?</summary><p>Hammasi sizning serveringizda. Userbot faqat karta botlari xabarlarini o'qiydi, pul o'tkaza olmaydi. TG_SESSION va SHOP_KEY ni hech kimga bermang.</p></details>
+  <details><summary>💬 Yordam</summary><p><a class="g" href="{{SUPPORT_URL}}">Support</a> · <a class="g" href="{{CHANNEL_URL}}">Kanal</a></p></details>
+</div></section>
+
+<footer>© {{APP_NAME}} · {{BASE_URL}}</footer>
+
+<script>
+const BASE = "{{BASE_URL}}";
+const SAMPLES = {
+"create": `POST ${BASE}/payment/create
+Content-Type: application/x-www-form-urlencoded
+
+shop_id=SHOP_ID&shop_key=SHOP_KEY&amount=50000&order_id=ORD-1024
+
+// Javob (200)
+{
+  "payment_id": "a1b2c3d4e5f6",
+  "order_id":   "ORD-1024",
+  "amount":     50000,
+  "card":       "8600 1234 5678 9012",
+  "card_holder":"ALI VALIYEV",
+  "expires_in": 300,
+  "expire_at":  1767225600,
+  "message":    "To'lov muvaffaqiyatli yaratildi!"
+}
+
+// Xato (400/401): { "error": "Do'kon topilmadi!" }
+// Bir xil summada ochiq to'lov bo'lsa:
+// { "error": "Bu summada ochiq to'lov mavjud..." }`,
+"callback": `// prepare_url va complete_url ga POST (form) keladi:
+shop_id=SHOP_ID
+payment_id=a1b2c3d4e5f6
+order_id=ORD-1024
+amount=50000
+status=prepare | paid | cancel
+card=8600 1234 5678 9012
+paid_at=1767225412
+sign=md5(shop_id + payment_id + amount + shop_key)
+
+// Javob sifatida HTTP 200 qaytaring.
+// 2xx bo'lmasa — qayta urinish (CALLBACK_RETRIES marta).`,
+"status": `GET ${BASE}/payment/status?shop_id=SHOP_ID&shop_key=SHOP_KEY&payment_id=a1b2c3d4e5f6
+
+{
+  "payment_id": "a1b2c3d4e5f6",
+  "order_id": "ORD-1024",
+  "amount": 50000,
+  "status": "paid",
+  "paid_at": 1767225412
+}
+
+// cancel:
+POST ${BASE}/payment/cancel
+shop_id=...&shop_key=...&payment_id=a1b2c3d4e5f6`,
+"python": `import hashlib, requests
+
+BASE = "${BASE}"
+SHOP_ID, SHOP_KEY = "my_shop", "sk_xxxxxxxx"
+
+r = requests.post(f"{BASE}/payment/create", data={
+    "shop_id": SHOP_ID, "shop_key": SHOP_KEY,
+    "amount": 50000, "order_id": "ORD-1024",
+}).json()
+print(r["card"], r["payment_id"])
+
+# complete_url handler (FastAPI / Flask)
+def verify(form):
+    raw = f"{SHOP_ID}{form['payment_id']}{form['amount']}{SHOP_KEY}"
+    return hashlib.md5(raw.encode()).hexdigest() == form["sign"]`,
+"php": `<?php
+$base = "${BASE}";
+$shopId = "my_shop"; $shopKey = "sk_xxxxxxxx";
+
+$ch = curl_init("$base/payment/create");
+curl_setopt_array($ch, [CURLOPT_POST => true, CURLOPT_RETURNTRANSFER => true,
+  CURLOPT_POSTFIELDS => http_build_query([
+    "shop_id" => $shopId, "shop_key" => $shopKey,
+    "amount" => 50000, "order_id" => "ORD-1024"])]);
+$res = json_decode(curl_exec($ch), true);
+
+// complete.php
+$sign = md5($shopId . $_POST["payment_id"] . $_POST["amount"] . $shopKey);
+if (!hash_equals($sign, $_POST["sign"] ?? "")) { http_response_code(403); exit; }
+if ($_POST["status"] === "paid") { /* buyurtmani tasdiqlang */ }
+echo "OK";`
+};
+const tabs = document.getElementById("tabs"), code = document.getElementById("code");
+Object.keys(SAMPLES).forEach((k, i) => {
+  const b = document.createElement("button");
+  b.className = "tab" + (i ? "" : " on"); b.textContent = k;
+  b.onclick = () => { document.querySelectorAll(".tab").forEach(t => t.classList.remove("on")); b.classList.add("on"); code.textContent = SAMPLES[k]; };
+  tabs.appendChild(b);
+});
+code.textContent = SAMPLES.create;
+document.getElementById("copy").onclick = e => { navigator.clipboard.writeText(code.textContent); e.target.textContent = "✓"; setTimeout(() => e.target.textContent = "Nusxalash", 1200); };
+
+// demo simulyator
+const log = document.getElementById("d_log"), icon = document.getElementById("d_icon"), txt = document.getElementById("d_text");
+const add = (c, s) => { log.innerHTML += `<span class="${c}">${s}</span>\n`; log.scrollTop = 1e9; };
+const wait = ms => new Promise(r => setTimeout(r, ms));
+document.getElementById("d_run").onclick = async e => {
+  e.target.disabled = true; log.innerHTML = "";
+  const amount = (+document.getElementById("d_amount").value || 50000).toLocaleString("ru-RU");
+  const id = Math.random().toString(16).slice(2, 14);
+  add("b", "POST /payment/create"); add("m", `shop_id=${document.getElementById("d_shop").value} amount=${amount}`);
+  await wait(700); add("g", `✓ payment_id: ${id}`); icon.textContent = "🔔"; txt.textContent = "prepare";
+  await wait(600); add("b", "POST prepare_url status=prepare"); icon.textContent = "⏳"; txt.textContent = "Kutilmoqda...";
+  const sec = 5 + Math.floor(Math.random() * 20);
+  for (let i = 1; i <= 4; i++) { await wait(700); add("y", `⏳ karta kuzatilmoqda... ${Math.round(sec * i / 4)}s`); }
+  add("m", `📩 @HumoCardBot: ➕ ${amount} UZS`);
+  await wait(500); add("g", `✅ To'lov tasdiqlandi (${sec}s)`); add("b", "POST complete_url status=paid");
+  icon.textContent = "✅"; txt.textContent = "paid"; e.target.disabled = false;
+};
+</script>
+</body>
+</html>
